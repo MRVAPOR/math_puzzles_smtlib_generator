@@ -10,7 +10,7 @@ STC_still_unknowns_1000 = [114, 390, 627, 633, 732, 921, 975]
 def STC(dir, minInt, maxInt):
     # sum of three cubes
     for i in range(minInt, maxInt+1):
-        with open('./'+dir+'/'+str(i).rjust(glb_n, '0')+'.smt2', 'w') as f:
+        with open('./'+dir+'/STC_'+str(i).rjust(glb_n, '0')+'.smt2', 'w') as f:
             f.write("(set-info :smt-lib-version 2.6)\n")
             f.write("(set-logic QF_NIA)\n")
             f.write("(set-info :source |\n" +
@@ -23,7 +23,7 @@ def STC(dir, minInt, maxInt):
                 "|)\n")
             f.write("(set-info :license \"https://creativecommons.org/licenses/by/4.0/\")\n")
             f.write("(set-info :category \"crafted\")\n")
-            f.write("(set-info :status " + ("unknown" if i in STC_still_unknowns_1000 else ("unsat" if (i % 9 == 4 or i % 9 == 5) else "sat")) + ")\n")
+            f.write("(set-info :status " + ("unknown" if i in STC_still_unknowns_1000 else ("unknown" if (i % 9 == 4 or i % 9 == 5) else "sat")) + ")\n")
             f.write("(declare-fun x () Int)\n")
             f.write("(declare-fun y () Int)\n")
             f.write("(declare-fun z () Int)\n")
@@ -108,8 +108,8 @@ def TA(dir, minInt, maxInt):
             for j in range(i):
                 x = "x" + str(j)
                 y = "y" + str(j)
-                f.write("(assert (>= "+ x +" 0))\n")
-                f.write("(assert (>= "+ y +" 0))\n")
+                f.write("(assert (> "+ x +" 0))\n")
+                f.write("(assert (> "+ y +" 0))\n")
             
             for j in range(i):
                 x_j = "x" + str(j)
@@ -276,6 +276,13 @@ def MS(dir, mode, minInt, maxInt):
                             y = "x_"+ str(m) + "_" + str(n)
                             f.write("(assert (distinct "+x +" "+y+"))\n")
             
+            # all elements are positive
+            for j in range(i):
+                for k in range(i):
+                    x = "x_"+ str(j) + "_" + str(k)
+                    # the same row
+                    f.write("(assert (> "+x +" 0))\n")
+
             f.write("(check-sat)\n")
             f.write(";;(get-assignment)\n")
             f.write(";;(get-model)\n")
@@ -298,7 +305,7 @@ if __name__ == "__main__":
         RTA(dir, minInt, maxInt)
     elif mode=="TA":
         assert(minInt>=0)
-        assert(maxInt<=100)
+        assert(maxInt<=13)
         TA(dir, minInt, maxInt)
     else:
         assert(minInt>=2)
